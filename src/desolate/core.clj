@@ -1,10 +1,14 @@
 (ns desolate.core
   (:require [quil.core :as q]))
+
 ;game-config-----
 (def screen-size [323 200])
 
 ;game-data-----
 (def key-queue (atom []))
+
+(def walk-speed 5)
+(def run-speed 10)
 
 (def player { :icon "@" })
 (def rock   { :icon "*" })
@@ -55,20 +59,49 @@
     :size [323 200]))
 
 ;updating-----
-(defn- update-position [old-pos]
-  (Pos. (+ 5 (:x old-pos))
-        (+ 5 (:y old-pos))
-        0))
+(defn- update-position [dx dy dz old-pos]
+  (Pos. (+ dx (:x old-pos))
+        (+ dy (:y old-pos))
+        (+ dz (:z old-pos))))
+
+(defn- move-player-up [speed world]
+  (update-in world [:objects 0 :pos] (partial update-position 0 (* -1 speed) 0)))
+
+(defn- move-player-left [speed world]
+  (update-in world [:objects 0 :pos] (partial update-position (* -1 speed) 0 0)))
+
+(defn- move-player-down [speed world]
+  (update-in world [:objects 0 :pos] (partial update-position 0 speed 0)))
+
+(defn- move-player-right [speed world]
+  (update-in world [:objects 0 :pos] (partial update-position speed 0 0)))
+
+(def key-bindings { \w (partial move-player-up    walk-speed) 
+                    \a (partial move-player-left  walk-speed)
+                    \s (partial move-player-down  walk-speed)
+                    \d (partial move-player-right walk-speed)
+                  
+                    \W (partial move-player-up run-speed)
+                    \A (partial move-player-left run-speed)
+                    \S (partial move-player-down run-speed)
+                    \D (partial move-player-right run-speed) })
   
 (defn- update-world [world] 
-  (update-in world [:objects 0 :pos] update-position))
+  (let [[input & _] @key-queue
+        input-fn (key-bindings input)]
+    (reset! key-queue [])
+    (if input-fn
+      (input-fn world)
+      world)))
 
 ;game-loop-----
 (defn- run []
   (start-rendering)
   (loop []
     (Thread/sleep 200)
-    (swap! world update-world)
+    (->> @world
+        (update-world)
+        (reset! world))
     (recur)))
 
 ;main-----
