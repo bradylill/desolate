@@ -8,12 +8,14 @@
 (def player { :icon "@" })
 (def rock   { :icon "*" })
 
-(def world { :objects [{:type player :pos [50000 10000 0]}
-                       {:type rock   :pos [50012 10002 0]}
-                       {:type rock   :pos [50022 10002 0]}
-                       {:type rock   :pos [50042 10012 0]}
-                       {:type rock   :pos [50052 10002 0]}
-                       {:type rock   :pos [50012 10012 0]}]})
+(defrecord Pos [x y z])
+
+(def world { :objects [{:type player :pos (Pos. 50000 10000 0)}
+                       {:type rock   :pos (Pos. 50012 10002 0)}
+                       {:type rock   :pos (Pos. 50022 10002 0)}
+                       {:type rock   :pos (Pos. 50042 10012 0)}
+                       {:type rock   :pos (Pos. 50052 10002 0)}
+                       {:type rock   :pos (Pos. 50012 10012 0)}]})
 
 ;helpers-----
 
@@ -25,8 +27,10 @@
   (q/background 200))
 
 (defn- draw-object [object current-pos]
-  (let [x (- ((:pos object) 0) (current-pos 0))
-        y (- ((:pos object) 1) (current-pos 1))]
+  (let [x (- (get-in object [:pos :x])
+             (:x current-pos))
+        y (- (get-in object [:pos :y])
+             (:y current-pos))]
     (q/text (get-in object [:type :icon]) x y)))
 
 (defn- draw-world [world current-pos]
@@ -34,7 +38,7 @@
     (draw-object object current-pos)))
 
 (defn draw []
-  (draw-world world [49839 9900 0]))
+  (draw-world world (Pos. 49839 9900 0)))
 
 (defn render []
   (q/defsketch desolate
