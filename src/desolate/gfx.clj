@@ -9,12 +9,21 @@
   (q/frame-rate 30)
   (q/background 200))
 
+(defn- draw-part [part reference-pos]
+  (let [x (+ (:x reference-pos)
+             (get-in part [:pos :x]))
+        y (+ (:y reference-pos)
+             (get-in part [:pos :y]))]
+    (q/text (:sprite part) x y)))
+
 (defn- draw-object [object current-pos]
   (let [x (- (get-in object [:pos :x])
              (:x current-pos))
         y (- (get-in object [:pos :y])
              (:y current-pos))]
-    (q/text (get-in object [:type :icon]) x y)))
+    (q/text (get-in object [:type :sprite]) x y)
+    (doseq [part (get-in object [:type :parts])]
+      (draw-part part (Pos. x y 0)))))
 
 (defn- draw-world [world current-pos]
   (doseq [object (:objects world)]
