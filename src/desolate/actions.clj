@@ -1,4 +1,5 @@
 (ns desolate.actions
+  (:require [desolate.game :as game])
   (:import  [desolate.game Pos]))
 
 ;helpers-----
@@ -8,6 +9,10 @@
         (+ dz (:z old-pos))))
 
 ;actions-----
+(defn set-player-vector [direction speed world]
+  (println direction " - " speed)
+  world)
+
 (defn move-player-up [speed world]
   (update-in world [:objects 0 :pos] (partial update-position 0 (* -1 speed) 0)))
 

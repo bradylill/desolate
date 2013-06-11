@@ -6,14 +6,24 @@
 (def key-queue (atom []))
 
 (defn key-press []
-  (swap! key-queue #(conj % (q/raw-key))))
+  (swap! key-queue #(conj % [(q/raw-key) :pressed])))
 
-(def key-bindings { \w (partial actions/move-player-up    game/walk-speed) 
-                    \a (partial actions/move-player-left  game/walk-speed)
-                    \s (partial actions/move-player-down  game/walk-speed)
-                    \d (partial actions/move-player-right game/walk-speed)
-                  
-                    \W (partial actions/move-player-up    game/run-speed)
-                    \A (partial actions/move-player-left  game/run-speed)
-                    \S (partial actions/move-player-down  game/run-speed)
-                    \D (partial actions/move-player-right game/run-speed) })
+(defn key-release []
+  (swap! key-queue #(conj % [(q/raw-key) :released])))
+
+(def key-bindings 
+  {
+   [\w :pressed] (partial actions/set-player-vector :up    game/walk-speed) 
+   [\a :pressed] (partial actions/set-player-vector :left  game/walk-speed)
+   [\s :pressed] (partial actions/set-player-vector :down  game/walk-speed)
+   [\d :pressed] (partial actions/set-player-vector :right game/walk-speed)
+
+   [\w :released] (partial actions/set-player-vector :up    0) 
+   [\a :released] (partial actions/set-player-vector :left  0)
+   [\s :released] (partial actions/set-player-vector :down  0)
+   [\d :released] (partial actions/set-player-vector :right 0)
+
+   [\W :pressed] (partial actions/set-player-vector :up    game/run-speed)
+   [\A :pressed] (partial actions/set-player-vector :left  game/run-speed)
+   [\S :pressed] (partial actions/set-player-vector :down  game/run-speed)
+   [\D :pressed] (partial actions/set-player-vector :right game/run-speed)})

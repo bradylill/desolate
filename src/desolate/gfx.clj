@@ -28,8 +28,8 @@
 (defn- draw-object [object current-pos]
   (let [x (object-coordinate :x object current-pos) 
         y (object-coordinate :y object current-pos)]
-    (q/text (get-in object [:type :sprite]) x y)
-    (doseq [part (get-in object [:type :parts])]
+    (q/text (:sprite object) x y)
+    (doseq [part (:parts object)]
       (draw-part part (Pos. x y 0)))))
 
 (defn- draw-world [world current-pos]
@@ -44,6 +44,7 @@
   (q/defsketch desolate
     :title "desolate"
     :key-typed input/key-press
+    :key-released input/key-release
     :setup setup
     :draw draw
     :size [800 600]))
